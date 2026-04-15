@@ -5,7 +5,10 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
 
+import os
+
 from translator.epub_reader import extract_epub_text
+from translator.google_translate import GoogleTranslateError, GoogleTranslator
 from translator.libre_translate import LibreTranslateError, LibreTranslator
 
 MAX_CHARS_PER_REQUEST = 4000
@@ -30,7 +33,7 @@ def split_text(text: str, max_chars: int = MAX_CHARS_PER_REQUEST) -> list[str]:
 class TranslatorApp:
     def __init__(self, root: tk.Tk) -> None:
         self.root = root
-        self.root.title("Chinese to English Translator (TXT/EPUB + LibreTranslate)")
+        self.root.title("Chinese to English Translator (TXT/EPUB)")
         self.root.geometry("980x760")
 
         self.input_path: Path | None = None
@@ -99,13 +102,17 @@ class TranslatorApp:
             messagebox.showwarning("No text", "No usable text was detected.")
             return
 
-        self.status_var.set("Translating with LibreTranslate...")
+        self.status_var.set("Translating...")
         self.root.update_idletasks()
 
         try:
-            translator = LibreTranslator(source="zh", target="en")
+            backend = os.getenv("TRANSLATION_BACKEND", "libre").strip().lower()
+            if backend == "google":
+                translator = GoogleTranslator(source="zh", target="en")
+            else:
+                translator = LibreTranslator(source="zh", target="en")
             translated_chunks = translator.translate_chunks(chunks)
-        except (ValueError, LibreTranslateError) as exc:
+        except (ValueError, LibreTranslateError, GoogleTranslateError) as exc:
             messagebox.showerror("Translation Error", str(exc))
             self.status_var.set("Translation failed.")
             return
