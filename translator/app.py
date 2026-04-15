@@ -5,8 +5,16 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
 
+<<<<<<< HEAD
+import os
+
 from translator.epub_reader import extract_epub_text
 from translator.google_translate import GoogleTranslateError, GoogleTranslator
+from translator.libre_translate import LibreTranslateError, LibreTranslator
+=======
+from translator.epub_reader import extract_epub_text
+from translator.google_translate import GoogleTranslateError, GoogleTranslator
+>>>>>>> origin/master
 
 MAX_CHARS_PER_REQUEST = 4000
 
@@ -30,7 +38,11 @@ def split_text(text: str, max_chars: int = MAX_CHARS_PER_REQUEST) -> list[str]:
 class TranslatorApp:
     def __init__(self, root: tk.Tk) -> None:
         self.root = root
+<<<<<<< HEAD
+        self.root.title("Chinese to English Translator (TXT/EPUB)")
+=======
         self.root.title("Chinese to English Translator (TXT/EPUB + Google API)")
+>>>>>>> origin/master
         self.root.geometry("980x760")
 
         self.input_path: Path | None = None
@@ -99,6 +111,19 @@ class TranslatorApp:
             messagebox.showwarning("No text", "No usable text was detected.")
             return
 
+<<<<<<< HEAD
+        self.status_var.set("Translating...")
+        self.root.update_idletasks()
+
+        try:
+            backend = os.getenv("TRANSLATION_BACKEND", "libre").strip().lower()
+            if backend == "google":
+                translator = GoogleTranslator(source="zh", target="en")
+            else:
+                translator = LibreTranslator(source="zh", target="en")
+            translated_chunks = translator.translate_chunks(chunks)
+        except (ValueError, LibreTranslateError, GoogleTranslateError) as exc:
+=======
         self.status_var.set("Translating with Google API...")
         self.root.update_idletasks()
 
@@ -106,6 +131,7 @@ class TranslatorApp:
             translator = GoogleTranslator(source="zh", target="en")
             translated_chunks = translator.translate_chunks(chunks)
         except (ValueError, GoogleTranslateError) as exc:
+>>>>>>> origin/master
             messagebox.showerror("Translation Error", str(exc))
             self.status_var.set("Translation failed.")
             return
